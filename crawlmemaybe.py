@@ -32,14 +32,24 @@ async def worker(session, queue, visited, lock, sorted_output, max_depth, includ
         # Fetch the URL content
         try:
             async with session.get(url) as response:
-                text = await response.text()
-        except:
-            print(f"Failed to get URL {url}")
+                if response.status = 200:
+                    text = await response.text()
+                else:
+                    print(f"HTTP error {response.status} when fetching {url}")
+                    queue.task_done()
+                    continue
+        except aiohttp.ClientError as e:
+            print(f"HTTP Error for URL {url}: {e}")
+            queue.task_done()
+            continue
+        except Exception as e:
+            print(f"Unexpected Error for URL {url}: {e}")
             queue.task_done()
             continue
 
         # Append the URL to the sorted_output list and print it
-        sorted_output.append(url)
+        async with lock:
+            sorted_output.append(url)
         print(url)
 
         # Parse the page content and enqueue new URLs
