@@ -32,7 +32,7 @@ async def worker(session, queue, visited, lock, sorted_output, max_depth, includ
         # Fetch the URL content
         try:
             async with session.get(url) as response:
-                if response.status = 200:
+                if response.status == 200:
                     text = await response.text()
                 else:
                     print(f"HTTP error {response.status} when fetching {url}")
